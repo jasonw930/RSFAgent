@@ -18,6 +18,10 @@ class ToolbarWindow: NSWindow {
     let font = NSFont.init(name: "Helvetica Neue", size: 30)
     
     let textVolume = NSTextField()
+    let elementVolume = Element()
+    
+    let textText = NSTextField()
+    let elementText = Element()
     
     func show() {
         let controller = NSWindowController(window: self)
@@ -47,17 +51,40 @@ class ToolbarWindow: NSWindow {
         self.makeKey()
         self.collectionBehavior = [.canJoinAllSpaces]
         
-        // FPS Textbox
-        textVolume.backgroundColor = self.backgroundColor
+        // Volume
+        textVolume.backgroundColor = backgroundColor
         textVolume.isBordered = false
         textVolume.textColor = NSColor.white
         textVolume.font = font
         textVolume.alignment = NSTextAlignment.center
-        textVolume.setFrameOrigin(NSPoint(x: 0, y: 720))
-        textVolume.setFrameSize(NSSize(width: 50, height: 50))
         textVolume.isBezeled = false
         textVolume.isEditable = false
+        textVolume.setFrameSize(NSSize(width: 50, height: 50))
+        textVolume.setFrameOrigin(NSPoint(x: 0, y: 710))
         self.contentView?.addSubview(textVolume)
+        
+        elementVolume.selected = true
+        elementVolume.alphaValue = 1
+        elementVolume.setFrameOrigin(NSPoint(x: (width - elementVolume.frame.width) / 2, y: 760))
+        elementVolume.down = {return self.elementVolume.switchToElement(self.elementText)}
+        self.contentView?.addSubview(elementVolume)
+        
+        // Text
+        textText.backgroundColor = backgroundColor
+        textText.isBordered = false
+        textText.textColor = NSColor.white
+        textText.font = font
+        textText.alignment = NSTextAlignment.center
+        textText.isBezeled = false
+        textText.isEditable = false
+        textText.stringValue = "T"
+        textText.setFrameSize(NSSize(width: 50, height: 50))
+        textText.setFrameOrigin(NSPoint(x: 0, y: 650))
+        self.contentView?.addSubview(textText)
+        
+        elementText.setFrameOrigin(NSPoint(x: (width - elementVolume.frame.width) / 2, y: 700))
+        elementText.up = {return self.elementText.switchToElement(self.elementVolume)}
+        self.contentView?.addSubview(elementText)
         
     }
     

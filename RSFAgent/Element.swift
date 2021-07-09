@@ -10,10 +10,49 @@ import Cocoa
 
 class Element: NSView {
 
+    var selected = false
+    let backgroundColor = NSColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
+    
+    var left: (() -> Element)!
+    var right: (() -> Element)!
+    var up: (() -> Element)!
+    var down: (() -> Element)!
+    
+    init() {
+        super.init(frame: NSMakeRect(0, 0, 6, 6))
+        
+        left = {return self}
+        right = {return self}
+        up = {return self}
+        down = {return self}
+        
+        self.alphaValue = 0
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    func switchToElement(_ element: Element) -> Element {
+        selected = false
+        alphaValue = 1
+        animator().alphaValue = 0
+        
+        element.selected = true
+        element.alphaValue = 0
+        element.animator().alphaValue = 1
+        
+        return element
+    }
+    
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        // Drawing code here.
+        backgroundColor.setFill()
+        dirtyRect.fill()
+        
+        NSColor.green.setFill()
+        NSBezierPath(ovalIn: dirtyRect).fill()
     }
     
 }

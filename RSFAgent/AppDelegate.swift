@@ -18,6 +18,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var hidden = true
     let toolbarWindow = ToolbarWindow()
+    var curElement: Element!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: globalKeyDownHandler)
@@ -38,11 +39,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         CGEvent.tapEnable(tap: eventTap, enable: true)
         CFRunLoopRun()
         
+        curElement = toolbarWindow.elementVolume
         toolbarWindow.show()
         
         Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { timer in
             self.toolbarWindow.loop(timer)
         }
+        
+        print("Finished Launching")
     }
     
     func applicationWillTerminate(_ aNotification: Notification) {
@@ -128,6 +132,25 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
             }
             appDelegate.hidden = !appDelegate.hidden
             return nil
+        }
+        
+        if flags == [.maskCommand] && 123 <= keyCode && keyCode <= 126 {
+            if !appDelegate.hidden {
+                switch keyCode {
+                case 123:
+                    appDelegate.curElement = appDelegate.curElement.left()
+                case 124:
+                    appDelegate.curElement = appDelegate.curElement.right()
+                case 125:
+                    appDelegate.curElement = appDelegate.curElement.down()
+                case 126:
+                    appDelegate.curElement = appDelegate.curElement.up()
+                default:
+                    break
+                }
+                return nil
+            }
+            return Unmanaged.passRetained(event)
         }
     }
     return Unmanaged.passRetained(event)

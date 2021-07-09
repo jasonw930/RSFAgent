@@ -30,6 +30,7 @@ class ToolbarWindow: NSWindow {
     }
     
     init() {
+        let appDelegate = NSApplication.shared.delegate as! AppDelegate
         super.init(contentRect: NSMakeRect(1440 - width, (900 - height) / 2, width, height),
                    styleMask: [.titled, .fullSizeContentView], backing: .buffered, defer: false);
         
@@ -82,7 +83,11 @@ class ToolbarWindow: NSWindow {
         textText.setFrameOrigin(NSPoint(x: 0, y: 650))
         self.contentView?.addSubview(textText)
         
-        elementText.setFrameOrigin(NSPoint(x: (width - elementVolume.frame.width) / 2, y: 700))
+        elementText.setFrameOrigin(NSPoint(x: (width - elementText.frame.width) / 2, y: 700))
+        elementText.left = {
+            Element.enterWindow(appDelegate.textWindow)
+            return self.elementText.switchToElement(appDelegate.textWindow.elementText)
+        }
         elementText.up = {return self.elementText.switchToElement(self.elementVolume)}
         self.contentView?.addSubview(elementText)
         

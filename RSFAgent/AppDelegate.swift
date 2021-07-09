@@ -17,7 +17,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // NSApplication.shared.delegate as! AppDelegate
     
     var hidden = true
-    let toolbarWindow = ToolbarWindow()
+    var toolbarWindow: ToolbarWindow!
+    var textWindow: TextWindow!
     var curElement: Element!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -39,8 +40,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         CGEvent.tapEnable(tap: eventTap, enable: true)
         CFRunLoopRun()
         
+        toolbarWindow = ToolbarWindow()
+        textWindow = TextWindow()
         curElement = toolbarWindow.elementVolume
+        
+        toolbarWindow.makeKey()
         toolbarWindow.show()
+        textWindow.show()
         
         Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { timer in
             self.toolbarWindow.loop(timer)

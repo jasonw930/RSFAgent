@@ -12,6 +12,7 @@
 		96529A2C262D289900B2B1F8 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96529A2A262D289900B2B1F8 /* MainMenu.xib */; };
 		96529A36262D295600B2B1F8 /* ToolbarWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96529A34262D295600B2B1F8 /* ToolbarWindow.swift */; };
 		967800BB2697E667006B6554 /* Element.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967800BA2697E667006B6554 /* Element.swift */; };
+		967800BD2697FEEE006B6554 /* TextWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967800BC2697FEEE006B6554 /* TextWindow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		96529A2E262D289900B2B1F8 /* RSFAgent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RSFAgent.entitlements; sourceTree = "<group>"; };
 		96529A34262D295600B2B1F8 /* ToolbarWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarWindow.swift; sourceTree = "<group>"; };
 		967800BA2697E667006B6554 /* Element.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Element.swift; sourceTree = "<group>"; };
+		967800BC2697FEEE006B6554 /* TextWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextWindow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +59,7 @@
 			children = (
 				96529A26262D289800B2B1F8 /* AppDelegate.swift */,
 				96529A34262D295600B2B1F8 /* ToolbarWindow.swift */,
+				967800BC2697FEEE006B6554 /* TextWindow.swift */,
 				967800BA2697E667006B6554 /* Element.swift */,
 				96529A28262D289900B2B1F8 /* Assets.xcassets */,
 				96529A2A262D289900B2B1F8 /* MainMenu.xib */,
@@ -136,6 +139,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				967800BD2697FEEE006B6554 /* TextWindow.swift in Sources */,
 				96529A27262D289800B2B1F8 /* AppDelegate.swift in Sources */,
 				96529A36262D295600B2B1F8 /* ToolbarWindow.swift in Sources */,
 				967800BB2697E667006B6554 /* Element.swift in Sources */,

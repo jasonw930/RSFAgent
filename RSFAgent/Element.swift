@@ -45,6 +45,18 @@ class Element: NSView {
         return element
     }
     
+    static func enterWindow(_ window: NSWindow) {
+        window.alphaValue = 0
+        window.animator().alphaValue = 1
+        window.makeKey()
+    }
+    
+    static func exitWindow(from: NSWindow, to: NSWindow) {
+        from.alphaValue = 1
+        from.animator().alphaValue = 0
+        to.makeKey()
+    }
+    
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 

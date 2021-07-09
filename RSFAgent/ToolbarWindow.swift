@@ -17,7 +17,7 @@ class ToolbarWindow: NSWindow {
     let height: CGFloat = 780
     let font = NSFont.init(name: "Helvetica Neue", size: 30)
     
-    let textFPS = NSTextField()
+    let textVolume = NSTextField()
     
     func show() {
         let controller = NSWindowController(window: self)
@@ -48,16 +48,16 @@ class ToolbarWindow: NSWindow {
         self.collectionBehavior = [.canJoinAllSpaces]
         
         // FPS Textbox
-        textFPS.backgroundColor = self.backgroundColor
-        textFPS.isBordered = false
-        textFPS.textColor = NSColor.white
-        textFPS.font = font
-        textFPS.alignment = NSTextAlignment.center
-        textFPS.setFrameOrigin(NSPoint(x: 0, y: 720))
-        textFPS.setFrameSize(NSSize(width: 50, height: 50))
-        textFPS.isBezeled = false
-        textFPS.isEditable = false
-        self.contentView?.addSubview(textFPS)
+        textVolume.backgroundColor = self.backgroundColor
+        textVolume.isBordered = false
+        textVolume.textColor = NSColor.white
+        textVolume.font = font
+        textVolume.alignment = NSTextAlignment.center
+        textVolume.setFrameOrigin(NSPoint(x: 0, y: 720))
+        textVolume.setFrameSize(NSSize(width: 50, height: 50))
+        textVolume.isBezeled = false
+        textVolume.isEditable = false
+        self.contentView?.addSubview(textVolume)
         
     }
     
@@ -99,7 +99,7 @@ class ToolbarWindow: NSWindow {
             &volumeSize,
             &volume)
         
-        textFPS.stringValue = String(Int(round(volume * 16)))
+        textVolume.stringValue = String(Int(round(volume * 16)))
     }
     
 }

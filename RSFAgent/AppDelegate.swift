@@ -17,6 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     // NSApplication.shared.delegate as! AppDelegate
     
     var hidden = true
+    var windows: [Window]!
     var toolbarWindow: ToolbarWindow!
     var textWindow: TextWindow!
     var curElement: Element!
@@ -42,6 +43,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         toolbarWindow = ToolbarWindow()
         textWindow = TextWindow()
+        windows = [toolbarWindow, textWindow]
         curElement = toolbarWindow.elementVolume
         
         toolbarWindow.makeKey()
@@ -59,53 +61,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
     }
     
-    func globalKeyDownHandler(event: NSEvent) {
-        commonKeyDownHandler(event: event)
-    }
-    
-    func localKeyDownHandler(event: NSEvent) -> NSEvent? {
-        commonKeyDownHandler(event: event)
-        
-        return event
-    }
-    
-    func commonKeyDownHandler(event: NSEvent) {
-        if event.modifierFlags.contains(.command) {
-            print("command+", terminator: "")
-        }
-        if event.modifierFlags.contains(.option) {
-            print("alt+", terminator: "")
-        }
-        if event.modifierFlags.contains(.shift) {
-            print("shift+", terminator: "")
-        }
-        print(event.keyCode)
-        
-        let flags = event.modifierFlags.intersection([.shift, .option, .control, .command])
-        
-        if flags == [.option, .command] && event.keyCode == 44 {
-            if !hidden {
-                toolbarWindow.alphaValue = 1
-                toolbarWindow.animator().alphaValue = 0
-            } else {
-                toolbarWindow.alphaValue = 0
-                toolbarWindow.animator().alphaValue = 1
-            }
-            hidden = !hidden
-            return
-        }
-        
-        if flags == [.option, .command] && event.keyCode == 123 {
-            if hidden {
-                toolbarWindow.alphaValue = 0
-                toolbarWindow.animator().alphaValue = 1
-                hidden = !hidden
-            }
-            NSApplication.shared.activate(ignoringOtherApps: true)
-            return
-        }
-    }
-
 }
 
 func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
@@ -113,6 +68,9 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
         let appDelegate = NSApplication.shared.delegate as! AppDelegate
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let flags = event.flags.intersection([.maskShift, .maskAlternate, .maskControl, .maskCommand])
+        var char = UniChar()
+        var length = 0
+        event.keyboardGetUnicodeString(maxStringLength: 1, actualStringLength: &length, unicodeString: &char)
         
         if flags.contains(.maskShift) {
             print("shift+", terminator: "")
@@ -128,18 +86,28 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
         }
         print(keyCode)
         
+        // cmd+alt+/
         if flags == [.maskAlternate, .maskCommand] && keyCode == 44 {
             if !appDelegate.hidden {
-                appDelegate.toolbarWindow.alphaValue = 1
-                appDelegate.toolbarWindow.animator().alphaValue = 0
+                for w in appDelegate.windows {
+                    if w.open {
+                        w.alphaValue = 1
+                        w.animator().alphaValue = 0
+                    }
+                }
             } else {
-                appDelegate.toolbarWindow.alphaValue = 0
-                appDelegate.toolbarWindow.animator().alphaValue = 1
+                for w in appDelegate.windows {
+                    if w.open {
+                        w.alphaValue = 0
+                        w.animator().alphaValue = 1
+                    }
+                }
             }
             appDelegate.hidden = !appDelegate.hidden
             return nil
         }
         
+        // cmd+left cmd+right cmd+up cmd+down
         if flags == [.maskCommand] && 123 <= keyCode && keyCode <= 126 {
             if !appDelegate.hidden {
                 switch keyCode {
@@ -157,6 +125,39 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
                 return nil
             }
             return Unmanaged.passRetained(event)
+        }
+        
+        if !appDelegate.hidden && appDelegate.curElement == appDelegate.textWindow.elementText {
+            let page = appDelegate.textWindow.pages[appDelegate.textWindow.curPage]
+            
+            if flags == [] && 123 <= keyCode && keyCode <= 126 {
+                switch keyCode {
+                case 123:
+                    page.moveLeft(nil)
+                case 124:
+                    page.moveRight(nil)
+                case 125:
+                    page.moveDown(nil)
+                case 126:
+                    page.moveUp(nil)
+                default:
+                    break
+                }
+                appDelegate.textWindow.updateTextField()
+                return nil
+            }
+            
+            if (flags == [] || flags == [.maskShift]) && (97 <= char && char <= 122 || 65 <= char && char <= 90 || [13, 32].contains(char)) {
+                page.insertText("\(Character(UnicodeScalar(char)!))")
+                appDelegate.textWindow.updateTextField()
+                return nil
+            }
+            
+            if flags == [] && char == 8 {
+                page.deleteBackward(nil)
+                appDelegate.textWindow.updateTextField()
+                return nil
+            }
         }
     }
     return Unmanaged.passRetained(event)

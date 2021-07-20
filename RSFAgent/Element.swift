@@ -45,15 +45,17 @@ class Element: NSView {
         return element
     }
     
-    static func enterWindow(_ window: NSWindow) {
+    static func enterWindow(_ window: Window) {
         window.alphaValue = 0
         window.animator().alphaValue = 1
+        window.open = true
         window.makeKey()
     }
     
-    static func exitWindow(from: NSWindow, to: NSWindow) {
+    static func exitWindow(from: Window, to: Window) {
         from.alphaValue = 1
         from.animator().alphaValue = 0
+        from.open = false
         to.makeKey()
     }
     

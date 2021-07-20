@@ -9,7 +9,7 @@
 import Cocoa
 import AudioToolbox
 
-class ToolbarWindow: NSWindow {
+class ToolbarWindow: Window {
 
     var lastTime = NSDate.timeIntervalSinceReferenceDate
     
@@ -22,7 +22,7 @@ class ToolbarWindow: NSWindow {
     
     let textText = NSTextField()
     let elementText = Element()
-    
+        
     func show() {
         let controller = NSWindowController(window: self)
         controller.showWindow(self)
@@ -35,6 +35,7 @@ class ToolbarWindow: NSWindow {
                    styleMask: [.titled, .fullSizeContentView], backing: .buffered, defer: false);
         
         self.alphaValue = 0
+        open = true
         
         
         // Removes the title bar

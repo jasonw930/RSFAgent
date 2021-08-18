@@ -22,6 +22,9 @@ class ToolbarWindow: Window {
     
     let textText = NSTextField()
     let elementText = Element()
+    
+    let textTrackpad = NSTextField()
+    let elementTrackpad = Element()
         
     func show() {
         let controller = NSWindowController(window: self)
@@ -37,21 +40,7 @@ class ToolbarWindow: Window {
         self.alphaValue = 0
         open = true
         
-        
-        // Removes the title bar
-        self.titleVisibility = .hidden
-        self.titlebarAppearsTransparent = true
-        self.standardWindowButton(.closeButton)?.isHidden = true
-        self.standardWindowButton(.miniaturizeButton)?.isHidden = true
-        self.standardWindowButton(.zoomButton)?.isHidden = true
-        
-        // Set color, disable movable
-        self.backgroundColor = NSColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
-        self.isMovable = false
-        
-        // Always on screen
-        self.makeKey()
-        self.collectionBehavior = [.canJoinAllSpaces]
+        setupWindow()
         
         // Volume
         textVolume.backgroundColor = backgroundColor
@@ -90,7 +79,29 @@ class ToolbarWindow: Window {
             return self.elementText.switchToElement(appDelegate.textWindow.elementText)
         }
         elementText.up = {return self.elementText.switchToElement(self.elementVolume)}
+        elementText.down = {return self.elementText.switchToElement(self.elementTrackpad)}
         self.contentView?.addSubview(elementText)
+        
+        // Trackpad
+        textTrackpad.backgroundColor = backgroundColor
+        textTrackpad.isBordered = false
+        textTrackpad.textColor = NSColor.white
+        textTrackpad.font = font
+        textTrackpad.alignment = NSTextAlignment.center
+        textTrackpad.isBezeled = false
+        textTrackpad.isEditable = false
+        textTrackpad.stringValue = "TP"
+        textTrackpad.setFrameSize(NSSize(width: 50, height: 50))
+        textTrackpad.setFrameOrigin(NSPoint(x: 0, y: 590))
+        self.contentView?.addSubview(textTrackpad)
+        
+        elementTrackpad.setFrameOrigin(NSPoint(x: (width - elementText.frame.width) / 2, y: 640))
+        elementTrackpad.left = {
+            Element.enterWindow(appDelegate.trackpadWindow)
+            return self.elementTrackpad.switchToElement(appDelegate.trackpadWindow.elementMode)
+        }
+        elementTrackpad.up = {return self.elementTrackpad.switchToElement(self.elementText)}
+        self.contentView?.addSubview(elementTrackpad)
         
     }
     

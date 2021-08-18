@@ -20,6 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var windows: [Window]!
     var toolbarWindow: ToolbarWindow!
     var textWindow: TextWindow!
+    var trackpadWindow: TrackpadWindow!
     var curElement: Element!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -29,7 +30,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
-            eventsOfInterest: CGEventMask(1 << CGEventType.keyDown.rawValue),
+            eventsOfInterest: CGEventMask(1 << CGEventType.keyDown.rawValue | 1 << 29), // 29 is gesture event, CGEventType doesn't define, stinky!!!
             callback: cgEventCallback,
             userInfo: nil)
         else {
@@ -43,12 +44,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         toolbarWindow = ToolbarWindow()
         textWindow = TextWindow()
-        windows = [toolbarWindow, textWindow]
+        trackpadWindow = TrackpadWindow()
+        windows = [toolbarWindow, textWindow, trackpadWindow]
         curElement = toolbarWindow.elementVolume
         
         toolbarWindow.makeKey()
         toolbarWindow.show()
         textWindow.show()
+        trackpadWindow.show()
         
         Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { timer in
             self.toolbarWindow.loop(timer)
@@ -64,8 +67,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 }
 
 func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, refcon: UnsafeMutableRawPointer?) -> Unmanaged<CGEvent>? {
+    let appDelegate = NSApplication.shared.delegate as! AppDelegate
     if type == .keyDown {
-        let appDelegate = NSApplication.shared.delegate as! AppDelegate
         let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
         let flags = event.flags.intersection([.maskShift, .maskAlternate, .maskControl, .maskCommand])
         var char = UniChar()
@@ -157,6 +160,17 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
                 page.deleteBackward(nil)
                 appDelegate.textWindow.updateTextField()
                 return nil
+            }
+        }
+    } else if type.rawValue == 29 {
+        let nsEvent = NSEvent(cgEvent: event)
+        let touch = nsEvent!.allTouches().first
+        if touch != nil {
+            print("\(touch!.normalizedPosition)")
+            if appDelegate.trackpadWindow.absolute {
+                let x = touch!.normalizedPosition.x * 1440
+                let y = (1 - touch!.normalizedPosition.y) * 900
+                CGDisplayMoveCursorToPoint(CGMainDisplayID(), NSPoint(x: x, y: y))
             }
         }
     }

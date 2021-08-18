@@ -21,6 +21,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var toolbarWindow: ToolbarWindow!
     var textWindow: TextWindow!
     var trackpadWindow: TrackpadWindow!
+    var trackpadBoundsWindow: TrackpadBoundsWindow!
     var curElement: Element!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
@@ -45,13 +46,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         toolbarWindow = ToolbarWindow()
         textWindow = TextWindow()
         trackpadWindow = TrackpadWindow()
-        windows = [toolbarWindow, textWindow, trackpadWindow]
+        trackpadBoundsWindow = TrackpadBoundsWindow()
+        windows = [toolbarWindow, textWindow, trackpadWindow, trackpadBoundsWindow]
         curElement = toolbarWindow.elementVolume
         
         toolbarWindow.makeKey()
         toolbarWindow.show()
         textWindow.show()
         trackpadWindow.show()
+        trackpadBoundsWindow.show()
         
         Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { timer in
             self.toolbarWindow.loop(timer)
@@ -166,10 +169,13 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
         let nsEvent = NSEvent(cgEvent: event)
         let touch = nsEvent!.allTouches().first
         if touch != nil {
-            print("\(touch!.normalizedPosition)")
+            // print("\(touch!.normalizedPosition)")
             if appDelegate.trackpadWindow.absolute {
-                let x = touch!.normalizedPosition.x * 1440
-                let y = (1 - touch!.normalizedPosition.y) * 900
+                let bounds = appDelegate.trackpadBoundsWindow.bounds.map{CGFloat($0)}
+                var x = (touch!.normalizedPosition.x - bounds[0]) / (bounds[1] - bounds[0]) * 1440
+                x = max(0, min(1440, x))
+                var y = (1 - (touch!.normalizedPosition.y - bounds[2]) / (bounds[3] - bounds[2])) * 900
+                y = max(0, min(900, y))
                 CGDisplayMoveCursorToPoint(CGMainDisplayID(), NSPoint(x: x, y: y))
             }
         }

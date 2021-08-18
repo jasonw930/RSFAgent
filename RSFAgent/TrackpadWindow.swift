@@ -10,9 +10,9 @@ import Cocoa
 import AudioToolbox
 
 class TrackpadWindow: Window {
-
+    
     let width: CGFloat = 200
-    let height: CGFloat = 100
+    let height: CGFloat = 120
     let font = NSFont.init(name: "Helvetica Neue", size: 30)
     
     let textMode = NSTextField()
@@ -43,12 +43,16 @@ class TrackpadWindow: Window {
         textMode.alignment = NSTextAlignment.center
         textMode.isBezeled = false
         textMode.isEditable = false
-        textMode.setFrameSize(NSSize(width: width - 20, height: height - 40))
+        textMode.setFrameSize(NSSize(width: width - 20, height: height - 50))
         textMode.setFrameOrigin(NSPoint(x: 10, y: 10))
         textMode.stringValue = "Relative"
         self.contentView?.addSubview(textMode)
         
         elementMode.setFrameOrigin(NSPoint(x: (width - elementMode.frame.width) / 2, y: height - 20))
+        elementMode.left = {
+            Element.enterWindow(appDelegate.trackpadBoundsWindow)
+            return self.elementMode.switchToElement(appDelegate.trackpadBoundsWindow.elementTitle)
+        }
         elementMode.right = {
             Element.exitWindow(from: self, to: appDelegate.toolbarWindow)
             return self.elementMode.switchToElement(appDelegate.toolbarWindow.elementTrackpad)

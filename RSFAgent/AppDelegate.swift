@@ -22,11 +22,40 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var textWindow: TextWindow!
     var trackpadWindow: TrackpadWindow!
     var trackpadBoundsWindow: TrackpadBoundsWindow!
+    var oLogBehaviourWindow: OLogBehaviourWindow!
+    var oLogTriggerWindow: OLogTriggerWindow!
+    var oLogSaveWindow: OLogSaveWindow!
     var curElement: Element!
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // NSEvent.addGlobalMonitorForEvents(matching: .keyDown, handler: globalKeyDownHandler)
         // NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: localKeyDownHandler)
+        
+        toolbarWindow = ToolbarWindow()
+        textWindow = TextWindow()
+        trackpadWindow = TrackpadWindow()
+        trackpadBoundsWindow = TrackpadBoundsWindow()
+        oLogBehaviourWindow = OLogBehaviourWindow()
+        oLogTriggerWindow = OLogTriggerWindow()
+        oLogSaveWindow = OLogSaveWindow()
+        windows = [toolbarWindow, textWindow, trackpadWindow, trackpadBoundsWindow, oLogBehaviourWindow, oLogTriggerWindow, oLogSaveWindow]
+        curElement = toolbarWindow.elementVolume
+        print("Windows Created")
+        
+        toolbarWindow.makeKey()
+        toolbarWindow.show()
+        textWindow.show()
+        trackpadWindow.show()
+        trackpadBoundsWindow.show()
+        oLogBehaviourWindow.show()
+        oLogTriggerWindow.show()
+        oLogSaveWindow.show()
+        print("Windows Showed")
+        
+        Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { timer in
+            self.toolbarWindow.loop(timer)
+        }
+        
         guard let eventTap = CGEvent.tapCreate(
             tap: .cgSessionEventTap,
             place: .headInsertEventTap,
@@ -34,31 +63,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             eventsOfInterest: CGEventMask(1 << CGEventType.keyDown.rawValue | 1 << 29), // 29 is gesture event, CGEventType doesn't define, stinky!!!
             callback: cgEventCallback,
             userInfo: nil)
-        else {
-            print("failed to create event tap")
-            exit(1)
+            else {
+                print("failed to create event tap")
+                exit(1)
         }
         let runLoopSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, eventTap, 0)
         CFRunLoopAddSource(CFRunLoopGetCurrent(), runLoopSource, .commonModes)
         CGEvent.tapEnable(tap: eventTap, enable: true)
         CFRunLoopRun()
-        
-        toolbarWindow = ToolbarWindow()
-        textWindow = TextWindow()
-        trackpadWindow = TrackpadWindow()
-        trackpadBoundsWindow = TrackpadBoundsWindow()
-        windows = [toolbarWindow, textWindow, trackpadWindow, trackpadBoundsWindow]
-        curElement = toolbarWindow.elementVolume
-        
-        toolbarWindow.makeKey()
-        toolbarWindow.show()
-        textWindow.show()
-        trackpadWindow.show()
-        trackpadBoundsWindow.show()
-        
-        Timer.scheduledTimer(withTimeInterval: 0.04, repeats: true) { timer in
-            self.toolbarWindow.loop(timer)
-        }
+        print("Tap Created")
         
         print("Finished Launching")
     }
@@ -166,6 +179,7 @@ func cgEventCallback(proxy: CGEventTapProxy, type: CGEventType, event: CGEvent, 
             }
         }
     } else if type.rawValue == 29 {
+        // print("Gesture!!")
         let nsEvent = NSEvent(cgEvent: event)
         let touch = nsEvent!.allTouches().first
         if touch != nil {

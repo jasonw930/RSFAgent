@@ -59,10 +59,19 @@ class Element: NSView {
         to.makeKey()
     }
     
+    static func exitWindows(from: [Window], to: Window) {
+        for w in from {
+            w.alphaValue = 1
+            w.animator().alphaValue = 0
+            w.open = false
+        }
+        to.makeKey()
+    }
+    
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
 
-        backgroundColor.setFill()
+        NSColor.clear.setFill()
         dirtyRect.fill()
         
         NSColor.green.setFill()

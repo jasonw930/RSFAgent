@@ -25,6 +25,9 @@ class ToolbarWindow: Window {
     
     let textTrackpad = NSTextField()
     let elementTrackpad = Element()
+    
+    let textOLog = NSTextField()
+    let elementOLog = Element()
         
     func show() {
         let controller = NSWindowController(window: self)
@@ -43,16 +46,7 @@ class ToolbarWindow: Window {
         setupWindow()
         
         // Volume
-        textVolume.backgroundColor = backgroundColor
-        textVolume.isBordered = false
-        textVolume.textColor = NSColor.white
-        textVolume.font = font
-        textVolume.alignment = NSTextAlignment.center
-        textVolume.isBezeled = false
-        textVolume.isEditable = false
-        textVolume.setFrameSize(NSSize(width: 50, height: 50))
-        textVolume.setFrameOrigin(NSPoint(x: 0, y: 710))
-        self.contentView?.addSubview(textVolume)
+        initToolbarItem(textVolume, pos: 0)
         
         elementVolume.selected = true
         elementVolume.alphaValue = 1
@@ -61,17 +55,8 @@ class ToolbarWindow: Window {
         self.contentView?.addSubview(elementVolume)
         
         // Text
-        textText.backgroundColor = backgroundColor
-        textText.isBordered = false
-        textText.textColor = NSColor.white
-        textText.font = font
-        textText.alignment = NSTextAlignment.center
-        textText.isBezeled = false
-        textText.isEditable = false
+        initToolbarItem(textText, pos: 1)
         textText.stringValue = "T"
-        textText.setFrameSize(NSSize(width: 50, height: 50))
-        textText.setFrameOrigin(NSPoint(x: 0, y: 650))
-        self.contentView?.addSubview(textText)
         
         elementText.setFrameOrigin(NSPoint(x: (width - elementText.frame.width) / 2, y: 700))
         elementText.left = {
@@ -83,17 +68,8 @@ class ToolbarWindow: Window {
         self.contentView?.addSubview(elementText)
         
         // Trackpad
-        textTrackpad.backgroundColor = backgroundColor
-        textTrackpad.isBordered = false
-        textTrackpad.textColor = NSColor.white
-        textTrackpad.font = font
-        textTrackpad.alignment = NSTextAlignment.center
-        textTrackpad.isBezeled = false
-        textTrackpad.isEditable = false
+        initToolbarItem(textTrackpad, pos: 2)
         textTrackpad.stringValue = "TP"
-        textTrackpad.setFrameSize(NSSize(width: 50, height: 50))
-        textTrackpad.setFrameOrigin(NSPoint(x: 0, y: 590))
-        self.contentView?.addSubview(textTrackpad)
         
         elementTrackpad.setFrameOrigin(NSPoint(x: (width - elementText.frame.width) / 2, y: 640))
         elementTrackpad.left = {
@@ -101,8 +77,33 @@ class ToolbarWindow: Window {
             return self.elementTrackpad.switchToElement(appDelegate.trackpadWindow.elementMode)
         }
         elementTrackpad.up = {return self.elementTrackpad.switchToElement(self.elementText)}
+        elementTrackpad.down = {return self.elementTrackpad.switchToElement(self.elementOLog)}
         self.contentView?.addSubview(elementTrackpad)
         
+        // OLog
+        initToolbarItem(textOLog, pos: 3)
+        textOLog.stringValue = "OL"
+        
+        elementOLog.setFrameOrigin(NSPoint(x: (width - elementText.frame.width) / 2, y: 580))
+        elementOLog.left = {
+            Element.enterWindow(appDelegate.oLogBehaviourWindow)
+            return self.elementOLog.switchToElement(appDelegate.oLogBehaviourWindow.elementBehaviour)
+        }
+        elementOLog.up = {return self.elementOLog.switchToElement(self.elementTrackpad)}
+        self.contentView?.addSubview(elementOLog)
+    }
+    
+    func initToolbarItem(_ tf: NSTextField, pos: Int) {
+        tf.backgroundColor = backgroundColor
+        tf.isBordered = false
+        tf.textColor = NSColor.white
+        tf.font = font
+        tf.alignment = NSTextAlignment.center
+        tf.isBezeled = false
+        tf.isEditable = false
+        tf.setFrameSize(NSSize(width: 50, height: 50))
+        tf.setFrameOrigin(NSPoint(x: 0, y: 710 - 60 * pos))
+        self.contentView?.addSubview(tf)
     }
     
     func loop(_ timer: Timer) {
